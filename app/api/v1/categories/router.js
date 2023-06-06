@@ -1,13 +1,10 @@
 const express = require('express')
 const router = express()
 
-const { create } = require('./controller')
+const { create, index } = require('./controller')
 
-router.get('/categories', (req, res) => {
-    res.status(200).json({
-        message: 'endpoint get all categories'
-    })
-})
+router.get('/categories', index)
 router.post('/categories', create)
+
 
 module.exports = router

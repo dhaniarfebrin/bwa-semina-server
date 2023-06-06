@@ -14,4 +14,16 @@ const create = async (req, res, next) => {
     }
 }
 
-module.exports = { create }
+const index = async (req, res, next) => {
+    try {
+        const result = await Categories.find()
+        
+        res.status(200).json({
+            data: result,
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+module.exports = { create, index }
