@@ -16,7 +16,7 @@ const create = async (req, res, next) => {
 
 const index = async (req, res, next) => {
     try {
-        const result = await Categories.find()
+        const result = await Categories.find().select('_id name')
         
         res.status(200).json({
             data: result,
@@ -26,4 +26,18 @@ const index = async (req, res, next) => {
     }
 }
 
-module.exports = { create, index }
+const find = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const result = await Categories.findOne({ _id: id })
+
+        res.status(200).json({
+            data: result
+        })
+    } catch (err) {
+        next(err)
+        
+    }
+}
+
+module.exports = { create, index, find }
