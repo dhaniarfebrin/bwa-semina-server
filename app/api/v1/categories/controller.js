@@ -1,18 +1,19 @@
 const Categories = require("./model");
-const { BadRequest } = require('../../../errors')
+const { BadRequest } = require("../../../errors");
 
 const {
     getAllCategories,
     createCategories,
-    getOneCategories
+    getOneCategories,
+    updateCategories,
 } = require("../../../services/mongoose/categories");
 
 const create = async (req, res, next) => {
     try {
         const { name } = req.body;
-        const check = await Categories.findOne({ name })
+        const check = await Categories.findOne({ name });
         if (check) {
-            throw new BadRequest('Kategori sudah ada')
+            throw new BadRequest("Kategori sudah ada");
         }
 
         const result = await createCategories(req);
@@ -53,14 +54,7 @@ const find = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { name } = req.body;
-
-        const result = await Categories.findByIdAndUpdate(
-            { _id: id },
-            { name },
-            { new: true, runValidators: true }
-        );
+        const result = await updateCategories(req);
 
         res.status(200).json({ data: result });
     } catch (err) {

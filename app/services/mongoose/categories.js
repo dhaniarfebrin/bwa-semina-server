@@ -1,5 +1,5 @@
 const Categories = require("../../api/v1/categories/model");
-const { NotFound } = require("../../errors");
+const { NotFound, BadRequest } = require("../../errors");
 
 const getAllCategories = async () => {
     const result = await Categories.find();
@@ -23,4 +23,28 @@ const getOneCategories = async (req) => {
     return result;
 };
 
-module.exports = { getAllCategories, createCategories, getOneCategories };
+const updateCategories = async (req) => {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const check = await Categories.findOne({
+        name,
+        _id: { $ne: id },
+    });
+
+    if (check) throw new BadRequest("Nama Kategori sudah ada");
+
+    const result = await Categories.findByIdAndUpdate(
+        id,
+        { name },
+        { new: true, runValidators: true }
+    );
+
+    if (!result) {
+        throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
+    }
+
+    return result;
+};
+
+module.exports = { getAllCategories, createCategories, getOneCategories, updateCategories };
