@@ -1,9 +1,21 @@
 const Categories = require("./model");
+const { BadRequest } = require('../../../errors')
+
+const {
+    getAllCategories,
+    createCategories,
+    getOneCategories
+} = require("../../../services/mongoose/categories");
 
 const create = async (req, res, next) => {
     try {
         const { name } = req.body;
-        const result = await Categories.create({ name });
+        const check = await Categories.findOne({ name })
+        if (check) {
+            throw new BadRequest('Kategori sudah ada')
+        }
+
+        const result = await createCategories(req);
 
         res.status(201).json({
             data: result,
@@ -16,7 +28,8 @@ const create = async (req, res, next) => {
 
 const index = async (req, res, next) => {
     try {
-        const result = await Categories.find().select("_id name");
+        // const result = await Categories.find().select("_id name");
+        const result = await getAllCategories();
 
         res.status(200).json({
             data: result,
@@ -28,13 +41,7 @@ const index = async (req, res, next) => {
 
 const find = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const result = await Categories.findOne({ _id: id });
-
-        if (!result)
-            return res
-                .status(404)
-                .json({ message: "Kategori tidak ditemukan" });
+        const result = await getOneCategories(req);
 
         res.status(200).json({
             data: result,
