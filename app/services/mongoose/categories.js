@@ -9,6 +9,12 @@ const getAllCategories = async () => {
 
 const createCategories = async (req) => {
     const { name } = req.body;
+
+    const check = await Categories.findOne({ name });
+    if (check) {
+        throw new BadRequest("Kategori sudah ada");
+    }
+
     const result = await Categories.create({ name });
 
     return result;
@@ -47,4 +53,23 @@ const updateCategories = async (req) => {
     return result;
 };
 
-module.exports = { getAllCategories, createCategories, getOneCategories, updateCategories };
+const deleteCategories = async (req) => {
+    const { id } = req.params;
+    const result = await Categories.findById(id);
+
+    if (!result) {
+        throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
+    }
+
+    await result.deleteOne();
+
+    return result;
+};
+
+module.exports = {
+    getAllCategories,
+    createCategories,
+    getOneCategories,
+    updateCategories,
+    deleteCategories,
+};
