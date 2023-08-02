@@ -1,27 +1,33 @@
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
 const app = express();
 
 // router
-const categoriesRouter = require('./app/api/v1/categories/router')
+const categoriesRouter = require("./app/api/v1/categories/router");
 
-const v1 = '/api/v1/cms'
+const v1 = "/api/v1/cms";
 
-app.use(logger('dev'));
+const notFoundMiddleware = require("./app/middleware/not-found");
+const handleErrorMiddleware = require("./app/middleware/handler-error");
+
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     res.status(200).json({
-        message: "Welcome to semina api"
-    })
+        message: "Welcome to semina api",
+    });
 });
 
-app.use(v1, categoriesRouter)
+app.use(v1, categoriesRouter);
+
+app.use(notFoundMiddleware);
+app.use(handleErrorMiddleware);
 
 module.exports = app;
