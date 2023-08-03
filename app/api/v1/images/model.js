@@ -5,7 +5,7 @@ let imageSchema = Schema(
     {
         name: { type: String },
     },
-    { timestamp: true }
+    { timestamps: true }
 );
 
 module.exports = model("Images", imageSchema);
