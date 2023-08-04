@@ -117,6 +117,9 @@ const updateEvent = async (req) => {
     await checkingCategories(category);
     await checkingTalents(talent);
 
+    const isAvailable = await Events.findById(id);
+    if (!isAvailable) throw new NotFound(`Tidak ada event dengan id : ${id}`);
+
     // cari event dengan field name
     const check = await Events.findOne({ title, _id: { $ne: id } });
 
