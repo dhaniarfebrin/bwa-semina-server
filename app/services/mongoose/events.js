@@ -88,12 +88,24 @@ const getOneEvents = async (req) => {
             select: "_id name role image",
             populate: { path: "image", select: "_id name" },
         });
-    
+
     if (!result) {
-        throw new NotFound(`Tidak ada event dengan id : ${id}`)
+        throw new NotFound(`Tidak ada event dengan id : ${id}`);
     }
 
-    return result
+    return result;
 };
 
-module.exports = { getAllEvents, getOneEvents, createEvents };
+const deleteEvents = async (req) => {
+    const { id } = req.params;
+
+    const result = await Events.findById(id);
+
+    if (!result) throw new NotFound(`Tidak ada event dengan id : ${id}`);
+
+    await result.deleteOne();
+
+    return result;
+};
+
+module.exports = { getAllEvents, getOneEvents, createEvents, deleteEvents };
