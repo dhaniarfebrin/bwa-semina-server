@@ -59,6 +59,12 @@ const updateTalents = async (req) => {
     // cari image daengan field image
     await checkingImage(image);
 
+    const isAvailable = await Talents.findById(id)
+    // jika id result false / null maka akan menampilkan error 'Tidak ada pembicara dengan id' yang dikirim client
+    if (!isAvailable) {
+        throw new NotFound(`Tidak ada pembicara dengan id : ${id}`);
+    }
+
     // cari talents dengan field name dan id selain dari yang dikirim dari params
     const check = await Talents.findOne({
         name,
@@ -76,10 +82,6 @@ const updateTalents = async (req) => {
         { new: true, runValidators: true }
     );
 
-    // jika id result false / null maka akan menampilkan error 'Tidak ada pembicara dengan id' yang dikirim client
-    if (!result) {
-        throw new NotFound(`Tidak ada pembicara dengan id : ${id}`);
-    }
 
     return result;
 };
