@@ -33,6 +33,11 @@ const updateCategories = async (req) => {
     const { id } = req.params;
     const { name } = req.body;
 
+    const isAvailable = await Categories.findById(id);
+    if (!isAvailable) {
+        throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
+    }
+
     const check = await Categories.findOne({
         name,
         _id: { $ne: id },
@@ -45,10 +50,6 @@ const updateCategories = async (req) => {
         { name },
         { new: true, runValidators: true }
     );
-
-    if (!result) {
-        throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
-    }
 
     return result;
 };
