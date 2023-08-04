@@ -96,6 +96,50 @@ const getOneEvents = async (req) => {
     return result;
 };
 
+const updateEvent = async (req) => {
+    const { id } = req.params;
+    const {
+        title,
+        date,
+        about,
+        tagline,
+        venueName,
+        keyPoint,
+        statusEvent,
+        tickets,
+        image,
+        category,
+        talent,
+    } = req.body;
+
+    // cari image, category dan talent dengan field id
+    await checkingImage(image);
+    await checkingCategories(category);
+    await checkingTalents(talent);
+
+    // cari event dengan field name
+    const check = await Events.findOne({ title, _id: { $ne: id } });
+
+    // apabila check true / data events sudah ada maka kita tampilkan error bad request dengan message pembicara duplikasi
+    if (check) throw new BadRequest("Judul event sudah ada");
+
+    const result = await Events.findByIdAndUpdate(id, {
+        title,
+        date,
+        about,
+        tagline,
+        venueName,
+        keyPoint,
+        statusEvent,
+        tickets,
+        image,
+        category,
+        talent,
+    });
+
+    return result;
+};
+
 const deleteEvents = async (req) => {
     const { id } = req.params;
 
@@ -108,4 +152,10 @@ const deleteEvents = async (req) => {
     return result;
 };
 
-module.exports = { getAllEvents, getOneEvents, createEvents, deleteEvents };
+module.exports = {
+    getAllEvents,
+    getOneEvents,
+    createEvents,
+    deleteEvents,
+    updateEvent,
+};
