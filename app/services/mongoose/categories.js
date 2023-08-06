@@ -15,14 +15,20 @@ const createCategories = async (req) => {
         throw new BadRequest("Kategori sudah ada");
     }
 
-    const result = await Categories.create({ name, organizer: req.user.organizer });
+    const result = await Categories.create({
+        name,
+        organizer: req.user.organizer,
+    });
 
     return result;
 };
 
 const getOneCategories = async (req) => {
     const { id } = req.params;
-    const result = await Categories.findOne({ _id: id });
+    const result = await Categories.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    });
 
     if (!result) throw new NotFound(`Tidak ada Kategori dengan id: ${id}`);
 
@@ -33,13 +39,17 @@ const updateCategories = async (req) => {
     const { id } = req.params;
     const { name } = req.body;
 
-    const isAvailable = await Categories.findById(id);
+    const isAvailable = await Categories.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    });
     if (!isAvailable) {
         throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
     }
 
     const check = await Categories.findOne({
         name,
+        organizer: req.user.organizer,
         _id: { $ne: id },
     });
 
@@ -56,7 +66,10 @@ const updateCategories = async (req) => {
 
 const deleteCategories = async (req) => {
     const { id } = req.params;
-    const result = await Categories.findById(id);
+    const result = await Categories.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    });
 
     if (!result) {
         throw new NotFound(`Tidak ada kategori dengan id: ${id}`);
