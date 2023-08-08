@@ -8,7 +8,7 @@ const { NotFound, BadRequest } = require("../../errors");
 const getAllTalents = async (req) => {
     const { keyword } = req.query;
 
-    let condition = {};
+    let condition = { organizer: req.user.organizer };
 
     if (keyword) {
         condition = { ...condition, name: { $regex: keyword, $options: "i" } };
@@ -28,12 +28,20 @@ const createTalents = async (req) => {
     await checkingImage(image);
 
     // cari talents dengan field name
-    const check = await Talents.findOne({ name });
+    const check = await Talents.findOne({
+        name,
+        organizer: req.user.organizer,
+    });
 
     // apabila check true / data talents sudah ada maka kita tampilkan error bad request dengan message pembicara duplikasi
     if (check) throw new BadRequest("Pembicara sudah terdaftar");
 
-    const result = await Talents.create({ name, image, role });
+    const result = await Talents.create({
+        name,
+        image,
+        role,
+        organizer: req.user.organizer,
+    });
 
     return result;
 };
@@ -41,7 +49,10 @@ const createTalents = async (req) => {
 const getOneTalents = async (req) => {
     const { id } = req.params;
 
-    const result = await Talents.findById(id)
+    const result = await Talents.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    })
         .populate({ path: "image", select: "_id name" })
         .select("_id name role image");
 
@@ -59,7 +70,7 @@ const updateTalents = async (req) => {
     // cari image daengan field image
     await checkingImage(image);
 
-    const isAvailable = await Talents.findById(id)
+    const isAvailable = await Talents.findById(id);
     // jika id result false / null maka akan menampilkan error 'Tidak ada pembicara dengan id' yang dikirim client
     if (!isAvailable) {
         throw new NotFound(`Tidak ada pembicara dengan id : ${id}`);
@@ -69,6 +80,7 @@ const updateTalents = async (req) => {
     const check = await Talents.findOne({
         name,
         _id: { $ne: id },
+        organizer: req.user.organizer,
     });
 
     // apabila check true / data talents sudah ada maka kita tampilkan error bad request dengan message pembicara nama duplikat
@@ -78,10 +90,9 @@ const updateTalents = async (req) => {
 
     const result = await Talents.findByIdAndUpdate(
         id,
-        { name, image, role },
+        { name, image, role, organizer: req.user.organizer },
         { new: true, runValidators: true }
     );
-
 
     return result;
 };
@@ -89,7 +100,10 @@ const updateTalents = async (req) => {
 const deleteTalent = async (req) => {
     const { id } = req.params;
 
-    const result = await Talents.findById(id);
+    const result = await Talents.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    });
 
     if (!result) {
         throw new NotFound(`Tidak ada pembicara dengan id : ${id}`);
