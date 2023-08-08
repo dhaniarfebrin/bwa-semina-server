@@ -73,8 +73,13 @@ const EventSchema = new mongoose.Schema(
             ref: "Talents",
             required: true,
         },
+        organizer: {
+            type: mongoose.Types.ObjectId,
+            ref: "Organizers",
+            required: true,
+        },
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model('Events', EventSchema)
+module.exports = mongoose.model("Events", EventSchema);
