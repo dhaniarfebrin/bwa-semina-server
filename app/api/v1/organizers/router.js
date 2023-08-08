@@ -5,7 +5,11 @@ const {
     authenticateUser,
     authorizeRoles,
 } = require("../../../middleware/auth");
-const { createCMSOrganizer, createCMSUser } = require("./controller");
+const {
+    createCMSOrganizer,
+    createCMSUser,
+    getCMSUser,
+} = require("./controller");
 
 // create organizer only owner allowed
 router.post(
@@ -22,5 +26,8 @@ router.post(
     authorizeRoles("organizer"),
     createCMSUser
 );
+
+// only owner can get all users
+router.get("/users", authenticateUser, authorizeRoles("owner"), getCMSUser);
 
 module.exports = router;
