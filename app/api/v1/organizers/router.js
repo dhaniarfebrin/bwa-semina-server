@@ -7,7 +7,20 @@ const {
 } = require("../../../middleware/auth");
 const { createCMSOrganizer, createCMSUser } = require("./controller");
 
-router.post("/organizers", createCMSOrganizer);
-router.post("/users", authenticateUser, createCMSUser);
+// create organizer only owner allowed
+router.post(
+    "/organizers",
+    authenticateUser,
+    authorizeRoles("owner"),
+    createCMSOrganizer
+);
+
+// create user(admin) only organizer can do
+router.post(
+    "/users",
+    authenticateUser,
+    authorizeRoles("organizer"),
+    createCMSUser
+);
 
 module.exports = router;
