@@ -8,7 +8,7 @@ const { NotFound, BadRequest } = require("../../errors");
 
 const getAllEvents = async (req) => {
     const { keyword, category, talent } = req.query;
-    let condition = {};
+    let condition = { organizer: req.user.organizer };
 
     if (keyword) {
         condition = { ...condition, title: { $regex: keyword, $options: "i" } };
@@ -72,6 +72,7 @@ const createEvents = async (req) => {
         image,
         category,
         talent,
+        organizer: req.user.organizer,
     });
 
     return result;
@@ -80,7 +81,10 @@ const createEvents = async (req) => {
 const getOneEvents = async (req) => {
     const { id } = req.params;
 
-    const result = await Events.findById(id)
+    const result = await Events.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    })
         .populate({ path: "image", select: "_id name" })
         .populate({ path: "category", select: "_id name" })
         .populate({
@@ -117,28 +121,37 @@ const updateEvent = async (req) => {
     await checkingCategories(category);
     await checkingTalents(talent);
 
-    const isAvailable = await Events.findById(id);
+    const isAvailable = await Events.findOne({ _id: id });
     if (!isAvailable) throw new NotFound(`Tidak ada event dengan id : ${id}`);
 
     // cari event dengan field name
-    const check = await Events.findOne({ title, _id: { $ne: id } });
+    const check = await Events.findOne({
+        title,
+        _id: { $ne: id },
+        organizer: req.user.organizer,
+    });
 
     // apabila check true / data events sudah ada maka kita tampilkan error bad request dengan message pembicara duplikasi
     if (check) throw new BadRequest("Judul event sudah ada");
 
-    const result = await Events.findByIdAndUpdate(id, {
-        title,
-        date,
-        about,
-        tagline,
-        venueName,
-        keyPoint,
-        statusEvent,
-        tickets,
-        image,
-        category,
-        talent,
-    });
+    const result = await Events.findOneAndUpdate(
+        { _id: id, organizer: req.user.organizer },
+        {
+            title,
+            date,
+            about,
+            tagline,
+            venueName,
+            keyPoint,
+            statusEvent,
+            tickets,
+            image,
+            category,
+            talent,
+            organizer: req.user.organizer,
+        },
+        { new: true, runValidators: true }
+    );
 
     return result;
 };
@@ -146,7 +159,10 @@ const updateEvent = async (req) => {
 const deleteEvents = async (req) => {
     const { id } = req.params;
 
-    const result = await Events.findById(id);
+    const result = await Events.findOne({
+        _id: id,
+        organizer: req.user.organizer,
+    });
 
     if (!result) throw new NotFound(`Tidak ada event dengan id : ${id}`);
 
