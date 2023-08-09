@@ -5,7 +5,14 @@ const {
     authenticateUser,
     authorizeRoles,
 } = require("../../../middleware/auth");
-const { create, index, find, update, destroy } = require("./controller");
+const {
+    create,
+    index,
+    find,
+    update,
+    destroy,
+    changeStatus,
+} = require("./controller");
 
 router.get("/events", authenticateUser, authorizeRoles("organizer"), index);
 router.get("/events/:id", authenticateUser, authorizeRoles("organizer"), find);
@@ -21,6 +28,14 @@ router.delete(
     authenticateUser,
     authorizeRoles("organizer"),
     destroy
+);
+
+// change status event
+router.put(
+    "/events/:id/status",
+    authenticateUser,
+    authorizeRoles("organizer", "admin"),
+    changeStatus
 );
 
 module.exports = router;

@@ -1,5 +1,8 @@
 const Orders = require("../../api/v1/orders/model");
 
+// import custom error not found dan bad request
+const { NotFound, BadRequest } = require("../../errors");
+
 const getAllOrders = async (req) => {
     const { limit = 10, page = 1, startDate, endDate } = req.query;
     let condition = {};
