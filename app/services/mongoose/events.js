@@ -7,7 +7,7 @@ const { checkingTalents } = require("./talents");
 const { NotFound, BadRequest } = require("../../errors");
 
 const getAllEvents = async (req) => {
-    const { keyword, category, talent } = req.query;
+    const { keyword, category, talent, status } = req.query;
     let condition = { organizer: req.user.organizer };
 
     if (keyword) {
@@ -20,6 +20,10 @@ const getAllEvents = async (req) => {
 
     if (talent) {
         condition = { ...condition, talent: talent };
+    }
+
+    if (["Draft", "Published"].includes(status)) {
+        condition = { ...condition, statusEvent: status };
     }
 
     const result = await Events.find(condition)
@@ -174,6 +178,12 @@ const deleteEvents = async (req) => {
 const changeStatusEvent = async (req) => {
     const { id } = req.params;
     const { statusEvent } = req.body;
+
+    if (!["Draft", "Published"].includes(statusEvent)) {
+        throw new BadRequest(
+            `Status event harus diantara Draft atau Published`
+        );
+    }
 
     // cari event berdasarkan field id
     const checkEvent = await Events.findOne({
