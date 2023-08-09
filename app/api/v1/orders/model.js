@@ -4,7 +4,7 @@ const orderDetailSchema = new mongoose.Schema({
     ticketCategories: {
         type: {
             type: String,
-            required: [true, "TIpe tiket harus diisi"],
+            required: [true, "Tipe tiket harus diisi"],
         },
         price: {
             type: Number,
@@ -71,7 +71,7 @@ const orderSchema = new mongoose.Schema(
         },
         event: {
             type: mongoose.Types.ObjectId,
-            ref: "Event",
+            ref: "Events",
             required: true,
         },
     },
