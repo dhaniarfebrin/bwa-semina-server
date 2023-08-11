@@ -6,4 +6,6 @@ module.exports = {
     jwtExpiration: "24h",
     jwtRefreshExpiration: "24h",
     jwtSecret: process.env.SECRET_TOKEN,
+    email: process.env.EMAIL,
+    password: process.env.EMAIL_PASSWORD,
 };
