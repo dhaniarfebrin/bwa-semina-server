@@ -5,8 +5,9 @@ const router = express();
 //     authenticateUser,
 //     authorizeRoles,
 // } = require("../../../middleware/auth");
-const { signup } = require("./controller");
+const { signup, activeParticipant } = require("./controller");
 
 router.post("/auth/signup", signup);
+router.put("/auth/active", activeParticipant);
 
 module.exports = router;
