@@ -6,7 +6,7 @@ const Payments = require("../../api/v1/payments/model");
 const { BadRequest, NotFound, UnauthorizedError } = require("../../errors");
 const { createTokenParticipant, createJWT } = require("../../utils");
 
-const { otpMail } = require("../email/index");
+const { otpMail, invoiceMail } = require("../email/index");
 
 const signupParticipant = async (req) => {
     const { firstName, lastName, email, password, role } = req.body;
@@ -116,7 +116,6 @@ const getOneEvent = async (req) => {
 };
 
 const getAllOrders = async (req) => {
-    console.log(req.participant);
     const result = await Orders.find({ participant: req.participant.id });
     return result;
 };
@@ -182,8 +181,10 @@ const checkoutOrder = async (req) => {
         historyEvent,
         payment,
     });
-
     await result.save();
+
+    await invoiceMail(personalDetail.email, result);
+
     return result;
 };
 
