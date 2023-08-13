@@ -134,7 +134,6 @@ const checkoutOrder = async (req) => {
     }
 
     const checkingPayment = await Payments.findOne({ _id: payment });
-
     if (!checkingPayment) {
         throw new NotFound("Tidak ada metode pembayaran dengan id :" + payment);
     }
